@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <NetworkLink>
+    <name>SHMU Live Radar</name>
+    <refreshVisibility>1</refreshVisibility>
+    <refreshInterval>300</refreshInterval>
+    <Link>
+      <href>https://shmuradar-oyhf.vercel.app/api/radar</href>
+      <refreshMode>onInterval</refreshMode>
+    </Link>
+  </NetworkLink>
+</kml>
