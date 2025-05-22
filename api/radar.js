@@ -12,7 +12,7 @@ async function checkImageExists(url) {
 
 function getRoundedTimeOffset(offsetMinutes = 0) {
   const date = new Date();
-  date.setMinutes(Math.floor(date.getMinutes() / 10) * 10);
+  date.setMinutes(Math.floor(date.getMinutes() / 5) * 5); // zmena na 5-minútové intervaly
   date.setMinutes(date.getMinutes() - offsetMinutes);
   date.setSeconds(0);
   date.setMilliseconds(0);
@@ -29,12 +29,12 @@ function formatTimestamp(date) {
 }
 
 export default async function handler(req) {
-  const maxTries = 6; // Skúsi 0 až 50 minút dozadu po 10 minút
+  const maxTries = 12; // Skúsi 0 až 55 minút dozadu po 5 minút
   let imageUrl = null;
   let timestamp = null;
 
   for (let i = 0; i < maxTries; i++) {
-    const date = getRoundedTimeOffset(i * 10);
+    const date = getRoundedTimeOffset(i * 5);
     const ts = formatTimestamp(date);
     const url = `https://www.shmu.sk/data/dataradary/data.cappi2km/cappi.2km.${ts}.0.png`;
     const exists = await checkImageExists(url);
