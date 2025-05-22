@@ -5,7 +5,7 @@
     <refreshVisibility>1</refreshVisibility>
     <refreshInterval>300</refreshInterval>
     <Link>
-      <href>https://shmuradar-oyhf.vercel.app/api/radar</href>
+      <href>https://shmuradar.vercel.app/api/radar</href>
       <refreshMode>onInterval</refreshMode>
     </Link>
   </NetworkLink>
