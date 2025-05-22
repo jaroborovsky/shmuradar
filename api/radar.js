@@ -6,8 +6,14 @@ export const config = {
 
 // Pomocná funkcia na zistenie, či existuje obrázok
 async function checkImageExists(url) {
-  const res = await fetch(url, { method: 'HEAD', redirect: 'manual' });
-  return res.status === 200;
+  //const res = await fetch(url, { method: 'HEAD', redirect: 'manual' });
+  //return res.status === 200;
+  try {
+    const res = await fetch(url, { method: 'GET', redirect: 'manual' });
+    return res.status === 200;
+  } catch {
+    return false;
+  }
 }
 
 function getRoundedTimeOffset(offsetMinutes = 0) {
