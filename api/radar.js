@@ -4,26 +4,55 @@ export const config = {
   runtime: 'edge',
 };
 
+// Pomocná funkcia na zistenie, či existuje obrázok
+async function checkImageExists(url) {
+  const res = await fetch(url, { method: 'HEAD' });
+  return res.ok;
+}
+
+function getRoundedTimeOffset(offsetMinutes = 0) {
+  const date = new Date();
+  date.setMinutes(Math.floor(date.getMinutes() / 10) * 10);
+  date.setMinutes(date.getMinutes() - offsetMinutes);
+  date.setSeconds(0);
+  date.setMilliseconds(0);
+  return date;
+}
+
+function formatTimestamp(date) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  const hour = String(date.getUTCHours()).padStart(2, '0');
+  const minute = String(date.getUTCMinutes()).padStart(2, '0');
+  return `${year}${month}${day}.${hour}${minute}`;
+}
+
 export default async function handler(req) {
-  const now = new Date();
-  const minutes = Math.floor(now.getMinutes() / 10) * 10;
-  now.setMinutes(minutes);
-  now.setSeconds(0);
-  now.setMilliseconds(0);
+  const maxTries = 6; // Skúsi 0 až 50 minút dozadu po 10 minút
+  let imageUrl = null;
+  let timestamp = null;
 
-  const year = now.getUTCFullYear();
-  const month = String(now.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(now.getUTCDate()).padStart(2, '0');
-  const hour = String(now.getUTCHours()).padStart(2, '0');
-  const minute = String(now.getUTCMinutes()).padStart(2, '0');
+  for (let i = 0; i < maxTries; i++) {
+    const date = getRoundedTimeOffset(i * 10);
+    const ts = formatTimestamp(date);
+    const url = `https://www.shmu.sk/data/dataradary/data.cappi2km/cappi.2km.${ts}.0.png`;
+    const exists = await checkImageExists(url);
+    if (exists) {
+      imageUrl = url;
+      timestamp = ts;
+      break;
+    }
+  }
 
-  const timestamp = `${year}${month}${day}.${hour}${minute}`;
-  const imageUrl = `https://www.shmu.sk/data/dataradary/data.cappi2km/cappi.2km.${timestamp}.0.png`;
+  if (!imageUrl) {
+    return new Response('Radarový obrázok nebol nájdený.', { status: 404 });
+  }
 
   const kml = `<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <GroundOverlay>
-    <name>Aktuálny radar SHMU</name>
+    <name>Aktuálny radar SHMU (${timestamp})</name>
     <Icon>
       <href>${imageUrl}</href>
     </Icon>
@@ -42,4 +71,4 @@ export default async function handler(req) {
       'Content-Type': 'application/vnd.google-earth.kml+xml'
     }
   });
-} 
+}
